@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vidriera VentaniYA - Soluciones 1001</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0c0f1d;
+      --panel-bg: #161b33;
+      --neon-cyan: #00f3ff;
+      --neon-orange: #ff9900;
+      --card-bg: #1c2340;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 15px;
+      background-color: var(--bg-color);
+      color: #fff;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    h1 {
+      margin: 0 0 15px 0;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px var(--neon-cyan);
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+    }
+
+    .main-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .gallery-section, .editor-section {
+      flex: 1 1 450px;
+      background: var(--panel-bg);
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 243, 255, 0.2);
+    }
+
+    .editor-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .search-bar {
+      margin-bottom: 15px;
+      width: 100%;
+    }
+
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #2d3748;
+      background: #0f1322;
+      color: #fff;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--neon-cyan);
+      outline: none;
+      box-shadow: 0 0 5px var(--neon-cyan);
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+      max-height: 500px;
+      overflow-y: auto;
+      padding-right: 5px;
+      width: 100%;
+    }
+
+    .grid-card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      padding: 5px;
+    }
+
+    .grid-card:hover, .grid-card.active {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px var(--neon-cyan);
+      transform: translateY(-2px);
+    }
+
+    .grid-card img {
+      width: 100%;
+      height: 85px;
+      object-fit: cover;
+      border-radius: 4px;
+      display: block;
+    }
+
+    .grid-card p {
+      margin: 4px 0 0 0;
+      font-size: 0.7rem;
+      color: #a0aec0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .form-group {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.8rem;
+      color: #a0aec0;
+      font-weight: bold;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.8);
+      background: #000;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn-download {
+      background: var(--neon-cyan);
+      color: #000;
+      box-shadow: 0 0 10px var(--neon-cyan);
+    }
+
+    .status-msg {
+      font-size: 0.85rem;
+      color: #00f3ff;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Vidriera VentaniYA Soluciones 1001 — Cartel Estático</h1>
+
+  <div class="main-layout">
+    <div class="gallery-section">
+      <h3>🏛️ Catálogo de Estampillas</h3>
+      <div id="statusMsg" class="status-msg">Cargando vidriera pública...</div>
+      
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="🔍 Buscar por nombre...">
+      </div>
+
+      <div class="grid-container" id="imageGrid"></div>
+    </div>
+
+    <div class="editor-section">
+      <h3>🖼️ Vista Previa del Aviso</h3>
+
+      <canvas id="mainCanvas" width="1000" height="750"></canvas>
+
+      <div class="form-group">
+        <label for="addressInput">📍 Dirección Comercial:</label>
+        <input type="text" id="addressInput">
+      </div>
+
+      <div class="form-group">
+        <label for="phoneInput">📞 Teléfono / WhatsApp:</label>
+        <input type="text" id="phoneInput">
+      </div>
+
+      <div class="form-group">
+        <label for="emailInput">✉️ Contacto / Correo:</label>
+        <input type="text" id="emailInput">
+      </div>
+
+      <div class="form-group">
+        <label for="logoInput">Cambiar Logo (Opcional):</label>
+        <input type="file" id="logoInput" accept="image/*">
+      </div>
+
+      <button class="btn btn-download" id="downloadBtn">📥 Descargar Publicidad (PNG)</button>
+    </div>
+  </div>
+
+  <script>
+    // Configurado automáticamente con tu nuevo repositorio: vidrieraavisos
+    const GITHUB_USER = 'ofispaciospaseo-del';
+    const GITHUB_REPO = 'vidrieraavisos';
+
+    const DEFAULT_ADDRESS = 'Paseo del Este - Local 12';
+    const DEFAULT_PHONE   = '+54 9 223 555-1234';
+    const DEFAULT_EMAIL   = 'contacto@estantesjet.com';
+
+    // Cargar valores guardados en la memoria del navegador de forma instantánea
+    const savedFoto = localStorage.getItem('vidrieraavisos_foto');
+    const savedDir  = localStorage.getItem('vidrieraavisos_dir') || DEFAULT_ADDRESS;
+    const savedTel  = localStorage.getItem('vidrieraavisos_tel') || DEFAULT_PHONE;
+    const savedMail = localStorage.getItem('vidrieraavisos_mail') || DEFAULT_EMAIL;
+
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const imageGrid = document.getElementById('imageGrid');
+    const searchInput = document.getElementById('searchInput');
+    const statusMsg = document.getElementById('statusMsg');
+
+    const addressInput = document.getElementById('addressInput');
+    const phoneInput = document.getElementById('phoneInput');
+    const emailInput = document.getElementById('emailInput');
+    const logoInput = document.getElementById('logoInput');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    addressInput.value = savedDir;
+    phoneInput.value   = savedTel;
+    emailInput.value   = savedMail;
+
+    let allImages = [];
+    let baseImage = new Image();
+    let globalLogo = new Image();
+    let uploadedLogo = null;
+    let currentHash = generateHash();
+
+    baseImage.crossOrigin = "anonymous";
+    globalLogo.crossOrigin = "anonymous";
+    globalLogo.src = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/logo.png`;
+
+    async function initGallery() {
+      statusMsg.textContent = 'Cargando imágenes de GitHub...';
+      try {
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`);
+        if (res.ok) {
+          const files = await res.json();
+          allImages = files
+            .filter(f => f.type === 'file' && f.name.match(/\.(jpg|jpeg|png|gif|webp)$/i) && f.name.toLowerCase() !== 'logo.png')
+            .map(f => ({ name: f.name, url: f.download_url }));
+          
+          statusMsg.textContent = `Total de imágenes cargadas: ${allImages.length}`;
+          renderGrid();
+
+          if (savedFoto) {
+            const match = allImages.find(img => img.name.toLowerCase() === savedFoto.toLowerCase());
+            if (match) {
+              baseImage.src = match.url;
+            } else {
+              baseImage.src = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${savedFoto}`;
+            }
+          } else if (allImages.length > 0) {
+            baseImage.src = allImages[0].url;
+            localStorage.setItem('vidrieraavisos_foto', allImages[0].name);
+          }
+          return;
+        }
+      } catch (e) {
+        statusMsg.textContent = 'Error al conectar con GitHub.';
+      }
+    }
+
+    function renderGrid() {
+      const q = searchInput.value.toLowerCase();
+      const filtered = allImages.filter(img => img.name.toLowerCase().includes(q));
+
+      imageGrid.innerHTML = '';
+
+      if (filtered.length === 0) {
+        imageGrid.innerHTML = '<p style="color:#a0aec0;">Sin imágenes encontradas.</p>';
+        return;
+      }
+
+      filtered.forEach((imgObj) => {
+        const card = document.createElement('div');
+        card.className = 'grid-card';
+        card.dataset.photoname = imgObj.name;
+        
+        card.innerHTML = `
+          <img src="${imgObj.url}" alt="${imgObj.name}">
+          <p>${imgObj.name}</p>
+        `;
+        
+        const currentActive = localStorage.getItem('vidrieraavisos_foto') || (allImages.length > 0 ? allImages[0].name : '');
+        if (imgObj.name.toLowerCase() === currentActive.toLowerCase()) {
+          card.classList.add('active');
+        }
+
+        // GUARDADO AUTOMÁTICO AL HACER CLIC EN LA FOTO
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          baseImage.src = imgObj.url;
+          
+          localStorage.setItem('vidrieraavisos_foto', imgObj.name);
+        });
+
+        imageGrid.appendChild(card);
+      });
+    }
+
+    searchInput.addEventListener('input', renderGrid);
+
+    // GUARDADO AUTOMÁTICO EN TIEMPO REAL AL ESCRIBIR
+    addressInput.addEventListener('input', () => {
+      localStorage.setItem('vidrieraavisos_dir', addressInput.value);
+    });
+    phoneInput.addEventListener('input', () => {
+      localStorage.setItem('vidrieraavisos_tel', phoneInput.value);
+    });
+    emailInput.addEventListener('input', () => {
+      localStorage.setItem('vidrieraavisos_mail', emailInput.value);
+    });
+
+    logoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          uploadedLogo = new Image();
+          uploadedLogo.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function generateHash() {
+      return 'ID-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+    }
+
+    function drawCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (baseImage.complete && baseImage.naturalWidth !== 0) {
+        ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#00f3ff';
+        ctx.font = '20px Roboto';
+        ctx.textAlign = 'center';
+        ctx.fillText('Cargando imagen...', canvas.width / 2, canvas.height / 2);
+      }
+
+      const grad = ctx.createLinearGradient(0, canvas.height - 180, 0, canvas.height);
+      grad.addColorStop(0, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, 'rgba(0,0,0,0.85)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, canvas.height - 180, canvas.width, 180);
+
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const secs = String(now.getSeconds()).padStart(2, '0');
+      const ms = String(now.getMilliseconds()).padStart(3, '0');
+
+      ctx.font = '900 38px "Orbitron", monospace';
+      ctx.fillStyle = '#00f3ff';
+      ctx.shadowColor = '#00f3ff';
+      ctx.shadowBlur = 10;
+      ctx.textAlign = 'left';
+      ctx.fillText(`${hrs}:${mins}:${secs}.${ms}`, 30, canvas.height - 95);
+
+      const dateStr = now.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase();
+      ctx.font = '700 15px "Roboto", sans-serif';
+      ctx.fillStyle = '#fff';
+      ctx.shadowBlur = 5;
+      ctx.fillText(dateStr, 30, canvas.height - 65);
+
+      ctx.font = '12px monospace';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.shadowBlur = 0;
+      ctx.fillText(`HASH: ${currentHash}`, 30, canvas.height - 40);
+
+      ctx.save();
+      const stampX = canvas.width - 120;
+      const stampY = canvas.height - 95;
+      ctx.strokeStyle = '#00f3ff';
+      ctx.shadowColor = '#00f3ff';
+      ctx.shadowBlur = 8;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(stampX, stampY, 55, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.font = '900 10px "Orbitron", sans-serif';
+      ctx.fillStyle = '#00f3ff';
+      ctx.textAlign = 'center';
+      ctx.fillText("VentaniYA", stampX, stampY - 10);
+      ctx.font = '700 8px "Roboto", sans-serif';
+      ctx.fillText("SOLUCIONES", stampX, stampY + 5);
+      ctx.font = '900 14px "Orbitron", sans-serif';
+      ctx.fillText("1001", stampX, stampY + 22);
+      ctx.restore();
+
+      ctx.fillStyle = 'rgba(12, 15, 29, 0.85)';
+      ctx.strokeStyle = '#00f3ff';
+      ctx.lineWidth = 1;
+      ctx.fillRect(25, 20, canvas.width - 50, 90);
+      ctx.strokeRect(25, 20, canvas.width - 50, 90);
+
+      let activeLogo = uploadedLogo || (globalLogo.complete && globalLogo.naturalWidth !== 0 ? globalLogo : null);
+
+      let textX = 40;
+      if (activeLogo) {
+        ctx.drawImage(activeLogo, 35, 25, 75, 75);
+        textX = 125;
+      }
+
+      ctx.textAlign = 'left';
+      ctx.font = '700 16px "Roboto", sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`📍 Dir: ${addressInput.value}`, textX, 45);
+      ctx.fillText(`📞 Tel: ${phoneInput.value}`, textX, 70);
+      ctx.fillText(`✉️ Mail: ${emailInput.value}`, textX, 92);
+    }
+
+    initGallery();
+    requestAnimationFrame(function renderLoop() {
+      drawCanvas();
+      requestAnimationFrame(renderLoop);
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = `Publicidad_${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  </script>
+</body>
+</html>
