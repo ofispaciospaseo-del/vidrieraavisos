@@ -157,6 +157,12 @@
       opacity: 0.9;
     }
 
+    .btn-fix {
+      background: var(--neon-orange);
+      color: #000;
+      box-shadow: 0 0 10px var(--neon-orange);
+    }
+
     .btn-download {
       background: var(--neon-cyan);
       color: #000;
@@ -167,6 +173,24 @@
       font-size: 0.85rem;
       color: #00f3ff;
       margin-bottom: 10px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--neon-orange);
+      color: #000;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 0 20px var(--neon-orange);
+      display: none;
+      z-index: 1000;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
     }
   </style>
 </head>
@@ -211,12 +235,15 @@
         <input type="file" id="logoInput" accept="image/*">
       </div>
 
+      <!-- BOTÓN DE FIJAR AVISO OBLIGATORIO -->
+      <button class="btn btn-fix" id="fixNoticeBtn">📌 FIJAR Y GUARDAR AVISO PERMANENTEMENTE</button>
       <button class="btn btn-download" id="downloadBtn">📥 Descargar Publicidad (PNG)</button>
     </div>
   </div>
 
+  <div class="toast" id="toastMsg">✅ ¡AVISO FIJADO CORRECTAMENTE!<br><span style="font-size:0.8rem; font-family:'Roboto',sans-serif;">Ya podés apretar F5 tranquilo, no se borra más.</span></div>
+
   <script>
-    // Configurado automáticamente con tu nuevo repositorio: vidrieraavisos
     const GITHUB_USER = 'ofispaciospaseo-del';
     const GITHUB_REPO = 'vidrieraavisos';
 
@@ -224,7 +251,7 @@
     const DEFAULT_PHONE   = '+54 9 223 555-1234';
     const DEFAULT_EMAIL   = 'contacto@estantesjet.com';
 
-    // Cargar valores guardados en la memoria del navegador de forma instantánea
+    // Recuperar de la memoria de la pantalla al arrancar
     const savedFoto = localStorage.getItem('vidrieraavisos_foto');
     const savedDir  = localStorage.getItem('vidrieraavisos_dir') || DEFAULT_ADDRESS;
     const savedTel  = localStorage.getItem('vidrieraavisos_tel') || DEFAULT_PHONE;
@@ -240,7 +267,9 @@
     const phoneInput = document.getElementById('phoneInput');
     const emailInput = document.getElementById('emailInput');
     const logoInput = document.getElementById('logoInput');
+    const fixNoticeBtn = document.getElementById('fixNoticeBtn');
     const downloadBtn = document.getElementById('downloadBtn');
+    const toastMsg = document.getElementById('toastMsg');
 
     addressInput.value = savedDir;
     phoneInput.value   = savedTel;
@@ -278,7 +307,6 @@
             }
           } else if (allImages.length > 0) {
             baseImage.src = allImages[0].url;
-            localStorage.setItem('vidrieraavisos_foto', allImages[0].name);
           }
           return;
         }
@@ -308,18 +336,17 @@
           <p>${imgObj.name}</p>
         `;
         
-        const currentActive = localStorage.getItem('vidrieraavisos_foto') || (allImages.length > 0 ? allImages[0].name : '');
+        const currentActive = savedFoto || (allImages.length > 0 ? allImages[0].name : '');
         if (imgObj.name.toLowerCase() === currentActive.toLowerCase()) {
           card.classList.add('active');
         }
 
-        // GUARDADO AUTOMÁTICO AL HACER CLIC EN LA FOTO
         card.addEventListener('click', () => {
           document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('active'));
           card.classList.add('active');
           baseImage.src = imgObj.url;
-          
-          localStorage.setItem('vidrieraavisos_foto', imgObj.name);
+          // Guardar temporalmente la foto seleccionada en atributo temporal
+          card.dataset.selectedName = imgObj.name;
         });
 
         imageGrid.appendChild(card);
@@ -327,17 +354,6 @@
     }
 
     searchInput.addEventListener('input', renderGrid);
-
-    // GUARDADO AUTOMÁTICO EN TIEMPO REAL AL ESCRIBIR
-    addressInput.addEventListener('input', () => {
-      localStorage.setItem('vidrieraavisos_dir', addressInput.value);
-    });
-    phoneInput.addEventListener('input', () => {
-      localStorage.setItem('vidrieraavisos_tel', phoneInput.value);
-    });
-    emailInput.addEventListener('input', () => {
-      localStorage.setItem('vidrieraavisos_mail', emailInput.value);
-    });
 
     logoInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
@@ -446,6 +462,24 @@
     requestAnimationFrame(function renderLoop() {
       drawCanvas();
       requestAnimationFrame(renderLoop);
+    });
+
+    // BOTÓN DE FIJAR AVISO OBLIGATORIO Y VISIBLE
+    fixNoticeBtn.addEventListener('click', () => {
+      const activeCard = document.querySelector('.grid-card.active');
+      let photoToFix = activeCard ? activeCard.dataset.photoname : (savedFoto || (allImages.length > 0 ? allImages[0].name : ''));
+
+      // Guardar de forma definitiva en la memoria de la pantalla
+      localStorage.setItem('vidrieraavisos_foto', photoToFix);
+      localStorage.setItem('vidrieraavisos_dir', addressInput.value);
+      localStorage.setItem('vidrieraavisos_tel', phoneInput.value);
+      localStorage.setItem('vidrieraavisos_mail', emailInput.value);
+
+      // Mostrar cartel de confirmación gigante en pantalla
+      toastMsg.style.display = 'block';
+      setTimeout(() => {
+        toastMsg.style.display = 'none';
+      }, 3500);
     });
 
     downloadBtn.addEventListener('click', () => {
